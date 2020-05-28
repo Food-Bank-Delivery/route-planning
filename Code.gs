@@ -205,6 +205,7 @@ function createRoutes(drivers, deliveries) {
   // Only drivers with routes are included
   var routes = [];
   var routeCounter = 0;
+  var rowCounter = 0;
   for (var i = 0; i < driverDeliveries.length; i++) {
     var stats = driverDeliveries[i];
     var driver = stats.driver;
@@ -216,6 +217,7 @@ function createRoutes(drivers, deliveries) {
         var delivery = stats.deliveries[j];
         capacityRemaining -= delivery.Boxes;
         var entry = {
+          Delivery: ++rowCounter,
           Route: routeCounter+1,
           Order: delivery.Order,
           Driver: driver.Name,
