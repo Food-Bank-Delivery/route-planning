@@ -173,6 +173,10 @@ function createRoutes(drivers, deliveries) {
   // Initialise the driver delivery objects (empty delivery lists)
   for (var i = 0; i < drivers.length; i++) {
     var driver = drivers[i];
+    // ignore null records
+    if (!driver.Name) {
+      continue;
+    }
     driverDeliveries.push({
       driver: driver,
       deliveries: [],
@@ -186,7 +190,7 @@ function createRoutes(drivers, deliveries) {
   // the failedDeliveries list
   for (var i = 0; i < deliveries.length; i++) {
     var delivery = deliveries[i];
-    // if the row has no address, skip
+    // ignore null records
     if (!delivery.Address) {
       continue;
     }
@@ -276,3 +280,6 @@ function onOpen() {
 }
 
 // end
+
+
+
