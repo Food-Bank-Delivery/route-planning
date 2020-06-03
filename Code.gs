@@ -110,6 +110,10 @@ function writeSheet(sheet, data) {
  */
 function createRoutes(drivers, deliveries) {
 
+  // remove null records
+  drivers = drivers.filter(d => d.Name != '');
+  deliveries = deliveries.filter(d => d.Address != '');
+
   // Sort deliveries with largest first
   deliveries.sort(function (a, b) {
       return (a.Boxes < b.Boxes ? 1 : (a.Boxes > b.Boxes ? -1 : 0));
@@ -173,10 +177,6 @@ function createRoutes(drivers, deliveries) {
   // Initialise the driver delivery objects (empty delivery lists)
   for (var i = 0; i < drivers.length; i++) {
     var driver = drivers[i];
-    // ignore null records
-    if (!driver.Name) {
-      continue;
-    }
     driverDeliveries.push({
       driver: driver,
       deliveries: [],
@@ -190,10 +190,6 @@ function createRoutes(drivers, deliveries) {
   // the failedDeliveries list
   for (var i = 0; i < deliveries.length; i++) {
     var delivery = deliveries[i];
-    // ignore null records
-    if (!delivery.Address) {
-      continue;
-    }
     var stats = findDriver(delivery.Boxes);
     if (stats) {
       stats.deliveries.push(delivery);
