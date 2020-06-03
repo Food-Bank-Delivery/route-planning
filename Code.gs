@@ -5,6 +5,10 @@
 // Extended 2020-05-22 by Josh Cassidy
 ////////////////////////////////////////////////////////////////////////
 
+// Minimum required headers (others may be present as well)
+var DRIVERS_SHEET_HEADERS = ["Name", "Email", "Mobile", "Capacity"];
+var DELIVERIES_SHEET_HEADERS = ["Order", "Client", "Address", "Phone", "Boxes"];
+
 /**
  * Top-level function
  */
@@ -19,9 +23,14 @@ function generateRoutes() {
     }
     
     // Read the data from the Drivers and Deliveries sheets as lists of objects
-    var drivers = readSheet(spreadsheet.getSheetByName("Drivers"));
-    var deliveries = readSheet(spreadsheet.getSheetByName("Deliveries"));
-    if (drivers === false || deliveries === false) {
+    var drivers = readSheet(spreadsheet.getSheetByName("Drivers"), DRIVERS_SHEET_HEADERS);
+    if (drivers == false) {
+        SpreadsheetApp.getUi().alert("Failed to read data from Drivers tab");
+        return;
+    }
+    var deliveries = readSheet(spreadsheet.getSheetByName("Deliveries"), DELIVERIES_SHEET_HEADERS);
+    if (deliveries == false) {
+        SpreadsheetApp.getUi().alert("Failed to read data from Deliveries tab");
         return;
     }
     
@@ -49,7 +58,7 @@ function readSheet(sheet, required_headers) {
     if (required_headers) {
         for (var i = 0; i < required_headers.length; i++) {
             if (!headers.includes(required_headers[i])) {
-                SpreadsheetApp.getUi().alert("Route planning already running in another tab");
+                SpreadsheetApp.getUi().alert("Missing required header " + required_headers[i]);
                 return false;
             }
         }
