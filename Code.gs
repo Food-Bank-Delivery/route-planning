@@ -23,22 +23,20 @@ function generateRoutes() {
     }
     
     // Read the data from the Drivers and Deliveries sheets as lists of objects
-    var drivers = readSheet(spreadsheet.getSheetByName("Drivers"), DRIVERS_SHEET_HEADERS);
+    var drivers = readSheet(getSheet(spreadsheet, "Drivers"), DRIVERS_SHEET_HEADERS);
     if (drivers == false) {
-        SpreadsheetApp.getUi().alert("Failed to read data from Drivers tab");
-        return;
+        throw new Error("Failed to read data from Drivers tab");
     }
-    var deliveries = readSheet(spreadsheet.getSheetByName("Deliveries"), DELIVERIES_SHEET_HEADERS);
+    var deliveries = readSheet(getSheet(spreadsheet, "Deliveries"), DELIVERIES_SHEET_HEADERS);
     if (deliveries == false) {
-        SpreadsheetApp.getUi().alert("Failed to read data from Deliveries tab");
-        return;
+        throw new Error("Failed to read data from Deliveries tab");
     }
     
     // Combine drivers and deliveries into routes
     var routes = createRoutes(drivers, deliveries);
     
     // Write the routes to the Routes tab (replacing any previous ones)
-    writeSheet(spreadsheet.getSheetByName("Raw Routes"), routes);
+    writeSheet(getSheet(spreadsheet, "Routes"), routes);
     
     // Clean up nicely
     lock.releaseLock();
@@ -54,12 +52,11 @@ function readSheet(sheet, required_headers) {
     var parsedData = [];
     var rawData = sheet.getDataRange().getValues();
     var headers = rawData[0];
-
+    
     if (required_headers) {
         for (var i = 0; i < required_headers.length; i++) {
             if (!headers.includes(required_headers[i])) {
-                SpreadsheetApp.getUi().alert("Missing required header " + required_headers[i]);
-                return false;
+                throw new Error("Missing required header " + required_headers[i]);
             }
         }
     }
@@ -80,6 +77,17 @@ function readSheet(sheet, required_headers) {
         }
     }
     return parsedData;
+}
+
+/**
+ * Look up a sheet, and throw an error if it doesn't exist.
+ */
+function getSheet(spreadsheet, name) {
+    var sheet = spreadsheet.getSheetByName(name);
+    if (sheet === null) {
+        throw new Error("Cannot open tab \"" + name + '"');
+    }
+    return sheet;
 }
 
 /**
@@ -244,7 +252,7 @@ function createRoutes(drivers, deliveries) {
                     Order: delivery.Order,
                     Driver: driver.Name,
                     Email: driver.Email,
-                    Client: delivery.Client,
+                    Client: delivery.Client,                  
                     Address: delivery.Address,
                     Phone: delivery. Phone,
                     Boxes: delivery.Boxes,
